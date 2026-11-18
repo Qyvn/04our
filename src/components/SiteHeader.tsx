@@ -7,14 +7,14 @@ import { usePurchasesContext } from "@/components/PurchasesProvider";
 
 const links = [
   { href: "/#listen", label: "Listen" },
-  { href: "/#shop", label: "Shop" },
+  { href: "/store", label: "Store" },
   { href: "/#support", label: "Support" },
   { href: "/#merch", label: "Merch" },
   { href: "/library", label: "My Crate" },
 ];
 
 export function SiteHeader() {
-  const { state, ready } = usePurchasesContext();
+  const { state, ready, cartCount, setCartOpen } = usePurchasesContext();
   const count = ready ? state.tracks.length : 0;
   const [open, setOpen] = useState(false);
 
@@ -61,17 +61,33 @@ export function SiteHeader() {
               ) : null}
             </Link>
           ))}
+          <button
+            type="button"
+            onClick={() => setCartOpen(true)}
+            className="border border-paper/30 px-3 py-1.5 text-paper transition-colors hover:border-signal hover:text-signal"
+          >
+            Cart{cartCount ? ` (${cartCount})` : ""}
+          </button>
         </nav>
 
-        <button
-          type="button"
-          className="border border-paper/30 px-3 py-1.5 text-[10px] font-ui uppercase tracking-[0.2em] text-paper transition-colors hover:border-signal hover:text-signal md:hidden"
-          aria-expanded={open}
-          aria-controls="mobile-nav"
-          onClick={() => setOpen((value) => !value)}
-        >
-          {open ? "Close" : `Menu${count ? ` · ${count}` : ""}`}
-        </button>
+        <div className="flex items-center gap-2 md:hidden">
+          <button
+            type="button"
+            onClick={() => setCartOpen(true)}
+            className="border border-paper/30 px-3 py-1.5 text-[10px] font-ui uppercase tracking-[0.2em] text-paper"
+          >
+            Cart{cartCount ? ` ${cartCount}` : ""}
+          </button>
+          <button
+            type="button"
+            className="border border-paper/30 px-3 py-1.5 text-[10px] font-ui uppercase tracking-[0.2em] text-paper transition-colors hover:border-signal hover:text-signal"
+            aria-expanded={open}
+            aria-controls="mobile-nav"
+            onClick={() => setOpen((value) => !value)}
+          >
+            {open ? "Close" : `Menu${count ? ` · ${count}` : ""}`}
+          </button>
+        </div>
       </div>
 
       {open ? (

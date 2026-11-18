@@ -6,6 +6,7 @@ import {
   type ReactNode,
 } from "react";
 import { usePurchases } from "@/hooks/usePurchases";
+import { CartDrawer } from "@/components/CartDrawer";
 
 type PurchasesContextValue = ReturnType<typeof usePurchases>;
 
@@ -16,6 +17,7 @@ export function PurchasesProvider({ children }: { children: ReactNode }) {
   return (
     <PurchasesContext.Provider value={value}>
       {children}
+      <CartDrawer />
       {value.toast ? (
         <div
           role="status"

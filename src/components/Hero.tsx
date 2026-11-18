@@ -40,10 +40,10 @@ export function Hero() {
             Put on the radio
           </Link>
           <Link
-            href="/#shop"
+            href="/store"
             className="border border-paper/40 px-5 py-3 text-[11px] font-ui uppercase tracking-[0.22em] text-paper transition-colors hover:border-signal hover:text-signal"
           >
-            Shop music
+            Buy music
           </Link>
         </div>
       </div>

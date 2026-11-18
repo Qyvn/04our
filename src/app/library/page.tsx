@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { TRACKS } from "@/lib/catalog";
+import { TRACKS, formatZar } from "@/lib/catalog";
 import { withBase } from "@/lib/paths";
 import { usePurchasesContext } from "@/components/PurchasesProvider";
 
@@ -23,8 +23,8 @@ export default function LibraryPage() {
           My Crate
         </h1>
         <p className="mt-3 max-w-xl text-sm text-asphalt md:text-base">
-          Songs you bought stay here forever. Lost a file? Re-download free.
-          Duplicate buys are blocked on this account (demo: this browser).
+          Licensed downloads stay here forever. Lost a file? Re-download free.
+          Duplicate buys are blocked on this browser (demo).
         </p>
 
         {!ready ? (
@@ -33,13 +33,14 @@ export default function LibraryPage() {
           <div className="mt-10 border border-dashed border-concrete p-8">
             <p className="text-paper">Your crate is empty.</p>
             <p className="mt-2 text-sm text-asphalt">
-              Buy a release on the shop, then come back to re-download anytime.
+              Open the music store, pick a license, checkout — then re-download
+              anytime.
             </p>
             <Link
-              href="/#shop"
+              href="/store"
               className="mt-6 inline-block bg-signal px-4 py-2 text-[10px] font-ui uppercase tracking-[0.2em] text-paper"
             >
-              Go to shop
+              Go to music store
             </Link>
           </div>
         ) : (
@@ -54,7 +55,11 @@ export default function LibraryPage() {
                     {ownedTrack.title}
                   </p>
                   <p className="text-[10px] font-ui uppercase tracking-[0.18em] text-asphalt">
-                    Owned{" "}
+                    {ownedTrack.licenseName ?? "License"}
+                    {ownedTrack.priceZar != null
+                      ? ` · ${formatZar(ownedTrack.priceZar)}`
+                      : ""}{" "}
+                    · Owned{" "}
                     {new Date(ownedTrack.purchasedAt).toLocaleDateString(
                       "en-ZA",
                       { timeZone: "Africa/Johannesburg" },
@@ -64,7 +69,7 @@ export default function LibraryPage() {
                 </div>
                 <a
                   href={withBase(meta?.preview || "/audio/preview-tone.mp3")}
-                  download={`${ownedTrack.trackId}-04our.mp3`}
+                  download={`${ownedTrack.trackId}-${ownedTrack.licenseId ?? "mp3"}-04our.mp3`}
                   className="inline-flex bg-signal px-4 py-2 text-[10px] font-ui uppercase tracking-[0.2em] text-paper"
                 >
                   Re-download free

@@ -4,7 +4,7 @@ Artist site for **04OUR (Anele Ngubane)** — Direction A “Four of a Kind Stre
 
 ## What it includes
 
-1. Direct on-site music purchases (demo)
+1. **Music store** (`/store`) — BeatStars-style flow: preview → MP3 / WAV / Exclusive license → cart → instant My Crate download (demo)
 2. Merchandise shelf
 3. Patreon-style support tiers
 4. **My Crate** — permanent access + free re-download; duplicate song buys blocked (`localStorage`)
