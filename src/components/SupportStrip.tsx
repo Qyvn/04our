@@ -18,8 +18,8 @@ export function SupportStrip() {
             Support 04OUR
           </h2>
           <p className="mt-3 text-sm text-asphalt md:text-base">
-            Subscribe like Patreon — back the artist, then buy music through the
-            same membership mindset. Demo pledges only.
+            Monthly tiers that fund the next drop. Demo pledges only — no real
+            billing yet.
           </p>
           {activeId ? (
             <p className="mt-4 text-sm text-signal">

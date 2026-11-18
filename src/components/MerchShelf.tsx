@@ -19,8 +19,7 @@ export function MerchShelf() {
             Merchandise
           </h2>
           <p className="mt-3 max-w-lg text-sm text-asphalt md:text-base">
-            Artist merch sold on-site. Shelf layout — not a card grid. Demo
-            orders only.
+            Wear the archive. Scroll the shelf, grab a piece. Demo orders only.
           </p>
         </div>
 

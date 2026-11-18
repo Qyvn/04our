@@ -20,9 +20,8 @@ export function MusicShop() {
             Buy the music
           </h2>
           <p className="mt-3 text-sm text-asphalt md:text-base">
-            Purchase songs and EPs here — not a plain one-off cart alone. Pair
-            with Support below for the patron model. Demo checkout only; no real
-            payments.
+            Buy releases on-site. Owned tracks land in My Crate for free
+            re-download — duplicate buys are blocked. Demo checkout only.
           </p>
         </div>
 

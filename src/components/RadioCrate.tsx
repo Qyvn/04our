@@ -140,7 +140,11 @@ export function RadioCrate() {
             </div>
           </div>
 
-          <div className="relative border border-concrete bg-concrete/40 p-5 md:p-6">
+          <div
+            className={`relative border border-concrete bg-concrete/40 p-5 md:p-6 ${
+              loaded ? "deck-live border-signal/50" : ""
+            }`}
+          >
             <div className="pointer-events-none absolute inset-x-6 top-3 h-px bg-asphalt/40" />
             <p className="text-[10px] font-ui uppercase tracking-[0.3em] text-asphalt">
               Old-style radio
