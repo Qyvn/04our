@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ink: #0a0a0a;
+  --concrete: #2a2a2a;
+  --paper: #f2f2f0;
+  --signal: #c8102e;
+  --asphalt: #6e6e6e;
+  --background: var(--ink);
+  --foreground: var(--paper);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--ink);
+  color: var(--paper);
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(200, 16, 46, 0.08), transparent 45%),
+    linear-gradient(180deg, #0a0a0a 0%, #101010 100%);
+  min-height: 100%;
+}
+
+::selection {
+  background: var(--signal);
+  color: var(--paper);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
