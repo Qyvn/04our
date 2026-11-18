@@ -4,7 +4,7 @@ Artist site for **04OUR (Anele Ngubane)** — Direction A “Four of a Kind Stre
 
 ## What it includes
 
-1. **Music store** (`/store`) — BeatStars-style flow: preview → MP3 / WAV / Exclusive license → cart → instant My Crate download (demo)
+1. **Music store** (`/store`) — BeatStars-style flow: preview → MP3 / WAV / Exclusive license → cart → instant My Crate download (demo). Official Ditto links for [ISINQUMO EP](https://ditto.fm/isinqumo-ep), [Ukuhlwa](https://ditto.fm/ukuhlwa-04our), [Kancane Kancane](https://ditto.fm/kancane-kancane-04our).
 2. Merchandise shelf
 3. Patreon-style support tiers
 4. **My Crate** — permanent access + free re-download; duplicate song buys blocked (`localStorage`)

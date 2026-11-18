@@ -108,9 +108,8 @@ export function MusicStore({ variant = "full", limit }: MusicStoreProps) {
               {variant === "full" ? "Buy music" : "Music marketplace"}
             </h2>
             <p className="mt-3 text-sm text-asphalt md:text-base">
-              Preview a track, pick an MP3 / WAV / Exclusive license, add to
-              cart, checkout — files unlock instantly in My Crate. Demo
-              payments only.
+              Preview on-site, stream via official Ditto links, or license MP3 /
+              WAV / Exclusive for download in My Crate. Demo payments only.
             </p>
           </div>
           {variant === "teaser" ? (
@@ -191,9 +190,15 @@ export function MusicStore({ variant = "full", limit }: MusicStoreProps) {
                     <div className="min-w-0">
                       <p className="truncate font-display text-xl text-paper">
                         {track.title}
+                        {track.featuring ? (
+                          <span className="ml-2 font-ui text-[10px] uppercase tracking-[0.14em] text-asphalt">
+                            feat. {track.featuring}
+                          </span>
+                        ) : null}
                       </p>
                       <p className="truncate text-[10px] font-ui uppercase tracking-[0.16em] text-asphalt">
-                        {ARTIST.stageName} · {track.tags.slice(0, 3).join(" · ")}
+                        {ARTIST.stageName} · {track.release}
+                        {track.dittoUrl ? " · Ditto" : ""}
                       </p>
                     </div>
                   </div>
@@ -202,7 +207,17 @@ export function MusicStore({ variant = "full", limit }: MusicStoreProps) {
                     {track.bpm} BPM · {track.musicalKey}
                   </p>
 
-                  <div className="col-span-2 flex justify-end md:col-span-1 md:w-36">
+                  <div className="col-span-2 flex flex-wrap items-center justify-end gap-2 md:col-span-1 md:w-auto">
+                    {track.dittoUrl ? (
+                      <a
+                        href={track.dittoUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="border border-paper/30 px-3 py-2 text-[10px] font-ui uppercase tracking-[0.18em] text-paper transition-colors hover:border-signal hover:text-signal"
+                      >
+                        Stream
+                      </a>
+                    ) : null}
                     {owned ? (
                       <Link
                         href="/library"
@@ -306,6 +321,11 @@ function LicensePicker({
             >
               {track.title}
             </h3>
+            {track.featuring ? (
+              <p className="mt-1 text-[10px] font-ui uppercase tracking-[0.18em] text-asphalt">
+                Feat. {track.featuring}
+              </p>
+            ) : null}
           </div>
           <button
             type="button"
@@ -315,6 +335,28 @@ function LicensePicker({
             Close
           </button>
         </div>
+
+        {track.tracklist?.length ? (
+          <ol className="mt-4 space-y-1 border border-concrete p-3 text-xs text-paper/80">
+            {track.tracklist.map((song, index) => (
+              <li key={song} className="flex gap-2">
+                <span className="text-asphalt">{String(index + 1).padStart(2, "0")}</span>
+                <span>{song}</span>
+              </li>
+            ))}
+          </ol>
+        ) : null}
+
+        {track.dittoUrl ? (
+          <a
+            href={track.dittoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 inline-flex text-[10px] font-ui uppercase tracking-[0.2em] text-signal hover:underline"
+          >
+            Official stream / pre-save on Ditto →
+          </a>
+        ) : null}
 
         <ul className="mt-6 space-y-3">
           {track.licenses.map((license) => {

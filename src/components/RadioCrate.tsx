@@ -219,6 +219,16 @@ export function RadioCrate() {
               <p className="mt-4 text-[10px] uppercase tracking-[0.2em] text-asphalt">
                 Sample only · Not a download · Full song after purchase
               </p>
+              {loaded?.dittoUrl ? (
+                <a
+                  href={loaded.dittoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 inline-flex text-[10px] font-ui uppercase tracking-[0.2em] text-signal hover:underline"
+                >
+                  Stream / pre-save on Ditto →
+                </a>
+              ) : null}
             </div>
           </div>
         </div>
