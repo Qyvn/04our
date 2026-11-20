@@ -1,9 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FEATURED, GROUPS, RELEASES, releaseById, type Release } from "@/data/songs";
 import { usePreviewPlayer } from "@/hooks/usePreviewPlayer";
 import { CassetteDeck } from "@/components/CassetteDeck";
+import { MiniPlayer } from "@/components/MiniPlayer";
+import { BuyButton } from "@/components/BuyButton";
+import { bundleOf, releaseSellable, songOf } from "@/lib/store";
 import { StreamingLinks } from "@/components/StreamingLinks";
 import { coverSrc } from "@/lib/cover";
 
@@ -31,12 +34,26 @@ export function ListenSection() {
 
   const release = releaseById(releaseId)!;
   const track = release.tracks.find((t) => t.id === trackId) ?? release.tracks[0];
-  const player = usePreviewPlayer(release.comingSoon ? undefined : track.previewUrl, true);
+  const player = usePreviewPlayer();
+  const [started, setStarted] = useState(false);
 
-  const select = (r: Release, tid?: string, scroll = false) => {
+  // Prime the deck with the default tape (no autoplay — browsers need a tap first).
+  useEffect(() => {
+    player.load(first.tracks[0].previewUrl, { play: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /**
+   * Choose a tape / song. MUST run straight from the tap handler: it sets the audio `src` and calls `play()`
+   * synchronously (no await / effect in between) so iOS Safari and Android Chrome allow the sound.
+   */
+  const select = (r: Release, tid?: string, opts: { scroll?: boolean } = {}) => {
+    const t = r.tracks.find((x) => x.id === tid) ?? r.tracks[0];
     setReleaseId(r.id);
-    setTrackId(tid ?? r.tracks[0].id);
-    if (scroll && typeof document !== "undefined") {
+    setTrackId(t.id);
+    setStarted(true);
+    player.load(r.comingSoon ? undefined : t.previewUrl, { play: true });
+    if (opts.scroll && typeof document !== "undefined") {
       document.getElementById("deck")?.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   };
@@ -67,24 +84,27 @@ export function ListenSection() {
           {FEATURED.map((r) => {
             const active = r.id === releaseId;
             return (
-              <button
-                key={r.id}
-                role="tab"
-                aria-selected={active}
-                type="button"
-                onClick={() => select(r)}
-                className={`shelf-item ${active ? "active" : ""}`}
-              >
-                <span className={`shelf-art ${r.format}`}>
-                  <Cover r={r} size={160} />
-                  {r.comingSoon && <em className="soon-tag">Coming soon</em>}
-                </span>
-                <span className="shelf-title">{r.title}</span>
-                <span className="shelf-meta">
-                  {r.kind}
-                  {r.released ? ` · ${year(r.released)}` : ""}
-                </span>
-              </button>
+              <div key={r.id} className={`shelf-cell ${active ? "active" : ""}`} role="presentation">
+                <button
+                  role="tab"
+                  aria-selected={active}
+                  type="button"
+                  onClick={() => select(r)}
+                  className={`shelf-item ${active ? "active" : ""}`}
+                  aria-label={`${r.comingSoon ? "Select" : "Play preview of"} ${r.title}`}
+                >
+                  <span className={`shelf-art ${r.format}`}>
+                    <Cover r={r} size={160} />
+                    {r.comingSoon ? <em className="soon-tag">Coming soon</em> : <span className="shelf-play" aria-hidden>▶</span>}
+                  </span>
+                  <span className="shelf-title">{r.title}</span>
+                  <span className="shelf-meta">
+                    {r.kind}
+                    {r.released ? ` · ${year(r.released)}` : ""}
+                  </span>
+                </button>
+                <BuyButton item={releaseSellable(r)} label={bundleOf(r) ? `Buy ${r.kind}` : "Buy"} className="shelf-buy" />
+              </div>
             );
           })}
         </div>
@@ -108,10 +128,10 @@ export function ListenSection() {
               {release.tracks.map((t, i) => {
                 const active = t.id === track.id;
                 return (
-                  <li key={t.id}>
+                  <li key={t.id} className="track-li">
                     <button
                       type="button"
-                      onClick={() => setTrackId(t.id)}
+                      onClick={() => select(release, t.id)}
                       className={`track-row ${active ? "active" : ""}`}
                       aria-current={active}
                     >
@@ -122,10 +142,20 @@ export function ListenSection() {
                       </span>
                       <span className="track-len">{t.length ?? ""}</span>
                     </button>
+                    <BuyButton item={songOf(release, t)} compact label="Buy song" />
                   </li>
                 );
               })}
             </ol>
+
+            {bundleOf(release) && (
+              <div className="bundle-row">
+                <span>
+                  <strong>{release.title}</strong> · whole {release.kind} ({release.tracks.length} songs)
+                </span>
+                <BuyButton item={bundleOf(release)!} label={`Buy ${release.kind}`} />
+              </div>
+            )}
 
             <div className="mt-8">
               <p className="kicker">Full track</p>
@@ -138,12 +168,13 @@ export function ListenSection() {
           </div>
         </div>
 
+        <MiniPlayer visible={started} release={release} track={track} player={player} />
+
         <div className="disco" id="discography">
           <div className="disco-head">
             <h3 className="h-lg">Full discography</h3>
             <p className="muted-note">
-              {RELEASES.reduce((n, r) => n + r.tracks.length, 0)} tracks · {RELEASES.length} releases · tap any row to load it
-              in the deck
+              {RELEASES.reduce((n, r) => n + r.tracks.length, 0)} tracks · {RELEASES.length} releases · tap a row to play a preview, or buy any song / EP
             </p>
           </div>
           <div className="disco-tools">
@@ -191,17 +222,18 @@ export function ListenSection() {
                       {r.comingSoon ? " · Coming soon" : ""}
                     </p>
                   </div>
+                  {bundleOf(r) && <BuyButton item={bundleOf(r)!} label={`Buy ${r.kind}`} compact className="disco-bundle" />}
                 </div>
                 <ul>
                   {r.tracks.map((t) => {
                     const active = r.id === releaseId && t.id === track.id;
                     const kind = r.comingSoon ? "Soon" : t.previewUrl ? "30s" : t.youtube ? "Video" : "—";
                     return (
-                      <li key={t.id}>
+                      <li key={t.id} className="disco-li">
                         <button
                           type="button"
                           className={`disco-track ${active ? "active" : ""}`}
-                          onClick={() => select(r, t.id, true)}
+                          onClick={() => select(r, t.id)}
                         >
                           <span className="disco-play" aria-hidden>
                             {active ? "●" : "▶"}
@@ -210,6 +242,7 @@ export function ListenSection() {
                           <span className="disco-kind">{kind}</span>
                           <span className="disco-len">{t.length ?? ""}</span>
                         </button>
+                        <BuyButton item={songOf(r, t)} compact />
                       </li>
                     );
                   })}

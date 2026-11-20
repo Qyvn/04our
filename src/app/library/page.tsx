@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { releaseById } from "@/data/songs";
+import { sellableByKey } from "@/lib/store";
 import { StreamingLinks } from "@/components/StreamingLinks";
 import { usePurchasesContext } from "@/components/PurchasesProvider";
 
@@ -10,7 +10,7 @@ const when = (iso: string) =>
 
 export default function LibraryPage() {
   const { state, ready, clearAll } = usePurchasesContext();
-  const owned = state.tracks.map((o) => ({ o, meta: releaseById(o.trackId) }));
+  const owned = state.tracks.map((o) => ({ o, found: sellableByKey(o.trackId) }));
 
   return (
     <main className="band-ink page-min">
@@ -19,8 +19,8 @@ export default function LibraryPage() {
           <p className="kicker">My Crate</p>
           <h1 className="h-xl">Yours for good.</h1>
           <p className="lede">
-            Releases you pick up stay here. Duplicate buys are blocked on this account (demo: this browser). Open any
-            release on your favourite platform from here.
+            Songs and EPs you pick up stay here (demo: saved in this browser only — no real payment was taken). Duplicate
+            buys are blocked. Open any of them on your favourite platform from here.
           </p>
         </header>
 
@@ -29,20 +29,22 @@ export default function LibraryPage() {
         ) : owned.length === 0 ? (
           <div className="empty-crate">
             <p>Your crate is empty.</p>
-            <p className="muted-note">Pick up a release in the shop, then come back anytime.</p>
-            <Link href="/#shop" className="btn btn-red btn-sm">
-              Go to shop
+            <p className="muted-note">Buy a song or an EP (demo checkout), then come back anytime.</p>
+            <Link href="/#listen" className="btn btn-red btn-sm">
+              Go to the music
             </Link>
           </div>
         ) : (
           <ul className="shop-list">
-            {owned.map(({ o, meta }) => (
+            {owned.map(({ o, found }) => (
               <li key={o.trackId} className="shop-row">
                 <div>
                   <p className="shop-title">{o.title}</p>
-                  <p className="shop-meta">Owned {when(o.purchasedAt)} · Africa/Johannesburg</p>
+                  <p className="shop-meta">
+                    {found ? `${found.item.subtitle} · ` : ""}Owned {when(o.purchasedAt)} · demo purchase
+                  </p>
                 </div>
-                {meta ? <StreamingLinks release={meta} /> : null}
+                {found ? <StreamingLinks release={found.release} track={found.item.kind === "song" ? found.release.tracks.find((t) => t.id === found.item.trackId) : undefined} /> : null}
               </li>
             ))}
           </ul>

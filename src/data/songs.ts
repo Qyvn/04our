@@ -50,8 +50,6 @@ export type Release = {
   format: "cd" | "cassette";
   /** Shown on the Listen shelf + sold in the demo shop. */
   featured?: boolean;
-  /** Demo-store price in ZAR (placeholder — no real payments). Featured releases only. */
-  priceZar?: number;
   comingSoon?: boolean;
   tracks: SongTrack[];
   links: {
@@ -89,7 +87,6 @@ export const RELEASES: Release[] = [
     "note": "Listed as “Coming soon” on the artist's Ditto page. An official YouTube upload already exists (id kept in this file) — flip comingSoon to false to switch the player on.",
     "comingSoon": true,
     "featured": true,
-    "priceZar": 29,
     "format": "cassette"
   },
   {
@@ -121,7 +118,6 @@ export const RELEASES: Release[] = [
       "soundcloud": "https://soundcloud.com/04our-music/kick-off-freestyle"
     },
     "featured": true,
-    "priceZar": 29,
     "format": "cassette"
   },
   {
@@ -148,7 +144,6 @@ export const RELEASES: Release[] = [
     "note": "Listed as “Coming soon” on the artist's Ditto page. An official YouTube upload already exists (id kept in this file) — flip comingSoon to false to switch the player on.",
     "comingSoon": true,
     "featured": true,
-    "priceZar": 29,
     "format": "cassette"
   },
   {
@@ -176,7 +171,6 @@ export const RELEASES: Release[] = [
     "note": "Listed as “Coming soon” on the artist's Ditto page. An official YouTube upload already exists (id kept in this file) — flip comingSoon to false to switch the player on.",
     "comingSoon": true,
     "featured": true,
-    "priceZar": 29,
     "format": "cassette"
   },
   {
@@ -204,7 +198,6 @@ export const RELEASES: Release[] = [
     },
     "note": "Not on Apple Music — plays the official YouTube upload.",
     "featured": true,
-    "priceZar": 29,
     "format": "cassette"
   },
   {
@@ -231,7 +224,6 @@ export const RELEASES: Release[] = [
       "soundcloud": "https://soundcloud.com/04our-music/alot"
     },
     "featured": true,
-    "priceZar": 29,
     "format": "cassette"
   },
   {
@@ -275,7 +267,6 @@ export const RELEASES: Release[] = [
       "soundcloud": "https://soundcloud.com/04our-music/sets/its-just-4-not-4-our"
     },
     "featured": true,
-    "priceZar": 29,
     "format": "cd"
   },
   {
@@ -333,7 +324,6 @@ export const RELEASES: Release[] = [
       "soundcloud": "https://soundcloud.com/04our-music/sets/in-4mation-ep"
     },
     "featured": true,
-    "priceZar": 99,
     "format": "cd"
   },
   {

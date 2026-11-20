@@ -4,12 +4,11 @@ import { useCallback, useEffect, useState } from "react";
 import {
   emptyPurchases,
   loadPurchases,
-  ownsTrack,
   savePurchases,
   type PurchaseState,
 } from "@/lib/purchases";
 import type { MerchItem, SupportTier } from "@/lib/catalog";
-import type { Release } from "@/data/songs";
+import { owns, type Sellable } from "@/lib/store";
 
 export function usePurchases() {
   const [state, setState] = useState<PurchaseState>(emptyPurchases);
@@ -33,11 +32,16 @@ export function usePurchases() {
     setToast(message);
   }, []);
 
-  const buyTrack = useCallback(
-    (track: Release) => {
+  /** Demo purchase: records ownership in this browser only. Never charges anything. */
+  const buy = useCallback(
+    (item: Sellable) => {
       const current = loadPurchases();
-      if (ownsTrack(current, track.id)) {
-        setToast("Already in your crate — re-download free from My Library.");
+      if (item.comingSoon) {
+        setToast(`${item.title} is coming soon.`);
+        return { ok: false as const, reason: "coming-soon" as const };
+      }
+      if (owns(current, item)) {
+        setToast("Already in your crate — open My Crate to find it.");
         setState(current);
         return { ok: false as const, reason: "duplicate" as const };
       }
@@ -45,14 +49,15 @@ export function usePurchases() {
         ...current,
         tracks: [
           ...current.tracks,
-          {
-            trackId: track.id,
-            title: track.title,
-            purchasedAt: new Date().toISOString(),
-          },
+          { trackId: item.key, title: item.title, purchasedAt: new Date().toISOString() },
         ],
       };
-      persist(next, `Owned: ${track.title}. Permanent access unlocked.`);
+      persist(
+        next,
+        item.kind === "bundle"
+          ? `Added to My Crate: ${item.title} (${item.songs} songs). Demo purchase.`
+          : `Added to My Crate: ${item.title}. Demo purchase.`,
+      );
       return { ok: true as const };
     },
     [persist],
@@ -104,10 +109,10 @@ export function usePurchases() {
     state,
     ready,
     toast,
-    buyTrack,
+    buy,
     buyMerch,
     joinSupport,
     clearAll,
-    ownsTrack: (id: string) => ownsTrack(state, id),
+    ownsItem: (item: Sellable) => owns(state, item),
   };
 }

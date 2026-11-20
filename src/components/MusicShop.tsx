@@ -1,14 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { FEATURED } from "@/data/songs";
-import { formatZar } from "@/lib/catalog";
+import { BuyButton } from "@/components/BuyButton";
+import { PRICE_NOTE } from "@/config/pricing";
+import { bundleOf, releaseSellable } from "@/lib/store";
 import { coverSrc } from "@/lib/cover";
-import { usePurchasesContext } from "@/components/PurchasesProvider";
 
 export function MusicShop() {
-  const { buyTrack, ownsTrack, ready } = usePurchasesContext();
-
   return (
     <section id="shop" className="band-ink">
       <div className="wrap">
@@ -16,14 +14,13 @@ export function MusicShop() {
           <p className="kicker">04 · Shop</p>
           <h2 className="h-xl">Own the music.</h2>
           <p className="lede">
-            Pick up a release here and it lives in My Crate for good. Demo checkout only — no real payments, and
-            prices are placeholders.
+            Every song and every EP/album can be bought — here, on the shelf, or in the full discography. Buying puts it in My Crate. {PRICE_NOTE}
           </p>
         </header>
 
         <ul className="shop-list">
           {FEATURED.map((r) => {
-            const owned = ready && ownsTrack(r.id);
+            const item = releaseSellable(r);
             return (
               <li key={r.id} className="shop-row">
                 <div className="shop-info">
@@ -34,25 +31,12 @@ export function MusicShop() {
                     <p className="shop-meta">
                       {r.kind}
                       {r.released ? ` · ${r.released.slice(0, 4)}` : ""} · {r.tracks.length}{" "}
-                      {r.tracks.length === 1 ? "track" : "tracks"} · {formatZar(r.priceZar ?? 0)}
+                      {r.tracks.length === 1 ? "track" : "tracks"}
                     </p>
                   </div>
                 </div>
                 <div className="shop-actions">
-                  {owned ? (
-                    <>
-                      <span className="owned">In your crate</span>
-                      <Link href="/library" className="btn btn-line btn-sm">
-                        Open My Crate
-                      </Link>
-                    </>
-                  ) : r.comingSoon ? (
-                    <span className="owned owned-soon">Coming soon</span>
-                  ) : (
-                    <button type="button" onClick={() => buyTrack(r)} className="btn btn-red btn-sm">
-                      Buy {formatZar(r.priceZar ?? 0)}
-                    </button>
-                  )}
+                  <BuyButton item={item} label={bundleOf(r) ? `Buy ${r.kind}` : "Buy song"} />
                 </div>
               </li>
             );

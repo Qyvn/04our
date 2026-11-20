@@ -10,7 +10,7 @@ Artist site for **04OUR (Anele Ngubane)** — Direction A “Four of a Kind Stre
 4. Direct on-site music purchases (demo, `localStorage`), merchandise shelf, patron support tiers, **My Crate**
 5. Socials: Instagram `04ofakind`, Facebook `04ourr`, YouTube `@04our66` and the "04our - Topic" channel
 
-No real payments. Prices are placeholders. Every track, preview URL and video id in `songs.ts` was verified
+No real payments. Prices are placeholders, all in ONE file: `src/config/pricing.ts` (song R29, EP/album bundle R99, optional per-item overrides). Every track, preview URL and video id in `songs.ts` was verified
 (iTunes Lookup API for artist 04our, Ditto smart-links, YouTube oEmbed). To add a song: add it to `RELEASES`.
 
 Design: bone / ink / signal-red (`#F2EFE8`, `#0B0B0C`, `#E4002B`); Anton, Space Grotesk and Space Mono.

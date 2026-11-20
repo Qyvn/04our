@@ -5,17 +5,19 @@ import type { Release, SongTrack } from "@/data/songs";
 import type { Player, PlayerStatus } from "@/hooks/usePreviewPlayer";
 import { YouTubeEmbed } from "@/components/YouTubeEmbed";
 import { coverSrc } from "@/lib/cover";
+import { BuyButton } from "@/components/BuyButton";
+import { bundleOf, songOf } from "@/lib/store";
 
 const fmt = (t: number) => `0:${String(Math.floor(t + 1e-6)).padStart(2, "0")}`;
 
 const LABEL: Record<PlayerStatus, string> = {
   idle: "No tape loaded",
-  loading: "Loading…",
+  loading: "Loading preview…",
   buffering: "Buffering…",
   playing: "Playing",
   paused: "Ready",
   ended: "Preview ended",
-  error: "Preview could not load",
+  error: "Preview didn't load",
   unavailable: "Preview unavailable",
 };
 
@@ -28,9 +30,9 @@ export function CassetteDeck({
   track: SongTrack | null;
   player: Player;
 }) {
-  const { status, time, duration, cap, play, pause, replay } = player;
+  const { status, time, duration, cap, play, pause, replay, retry, slow } = player;
   const isPlaying = status === "playing" || status === "loading" || status === "buffering";
-  const canPlay = !!track?.previewUrl && status !== "error";
+  const canPlay = !!track?.previewUrl && !release?.comingSoon;
   const pct = Math.min(100, (time / Math.max(1, duration)) * 100);
   const [showEmbed, setShowEmbed] = useState(false);
   useEffect(() => setShowEmbed(false), [track?.id]);
@@ -74,7 +76,7 @@ export function CassetteDeck({
       </div>
 
       <div className="deck-status" role="status" aria-live="polite">
-        <span data-testid="status">{LABEL[status]}</span>
+        <span data-testid="status">{status === "loading" && slow ? "Still loading — slow connection…" : LABEL[status]}</span>
         {track && canPlay && (
           <span className="deck-time">
             {fmt(time)} / {fmt(duration)}
@@ -96,11 +98,11 @@ export function CassetteDeck({
         <button
           type="button"
           className="deck-btn deck-btn-main"
-          onClick={() => (isPlaying ? pause() : play())}
+          onClick={() => (status === "error" ? retry() : isPlaying ? pause() : play())}
           disabled={!canPlay}
-          aria-label={isPlaying ? "Pause preview" : "Play preview"}
+          aria-label={status === "error" ? "Retry preview" : isPlaying ? "Pause preview" : "Play preview"}
         >
-          {isPlaying ? "❚❚ Pause" : "▶ Play"}
+          {status === "error" ? "↻ Retry" : isPlaying ? "❚❚ Pause" : "▶ Play"}
         </button>
         <button type="button" className="deck-btn" onClick={replay} disabled={!canPlay} aria-label="Replay preview from start">
           ↺ Replay
@@ -121,12 +123,24 @@ export function CassetteDeck({
       )}
       {status === "error" && (
         <p className="deck-note" role="alert">
-          The preview failed to load. Check your connection or open the full track below.
+          The preview didn’t load — check your connection and tap Retry, or open the full song on Apple Music below.
         </p>
       )}
 
+      {release && track && !soon && (
+        <div className="deck-buy">
+          <BuyButton item={songOf(release, track)} label="Buy song" />
+          {bundleOf(release) && <BuyButton item={bundleOf(release)!} label={`Buy ${release.kind}`} />}
+        </div>
+      )}
+      {release && soon && (
+        <div className="deck-buy">
+          <span className="buy buy-soon">Coming soon · pre-save not open yet</span>
+        </div>
+      )}
+
       {/* YouTube: primary for tracks without an Apple preview, optional "watch" for the rest */}
-      {track && yt && status === "unavailable" && <YouTubeEmbed id={yt.id} title={yt.title} />}
+      {track && yt && status === "unavailable" && <YouTubeEmbed id={yt.id} title={yt.title} autoLoad />}
       {track && yt && status !== "unavailable" && (
         <div className="deck-video">
           {showEmbed ? (
