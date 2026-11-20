@@ -15,28 +15,30 @@ export default function HomePage() {
       <MusicShop />
       <SupportStrip />
       <MerchShelf />
-      <section className="border-b border-concrete bg-ink">
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-16 md:grid-cols-2 md:px-6 md:py-24">
-          <div>
-            <p className="text-[10px] font-ui uppercase tracking-[0.35em] text-signal">
-              About
-            </p>
-            <h2 className="mt-2 font-display text-4xl text-paper md:text-5xl">
-              {ARTIST.legalName}
-            </h2>
-            <p className="mt-4 text-sm leading-relaxed text-asphalt md:text-base">
-              {ARTIST.about}
-            </p>
-          </div>
-          <div className="relative min-h-[280px] overflow-hidden border border-paper/15">
-            <Image
-              src={withBase("/portraits/denim.jpg")}
-              alt="04OUR portrait"
-              fill
-              className="object-cover object-top"
-              sizes="(max-width: 768px) 100vw, 50vw"
-            />
-          </div>
+      <section className="relative overflow-hidden border-b border-concrete bg-ink">
+        <div className="absolute inset-0">
+          <Image
+            src={withBase("/portraits/denim.jpg")}
+            alt=""
+            fill
+            className="object-cover object-[50%_20%] opacity-35"
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-ink via-ink/85 to-ink/40" />
+        </div>
+        <div className="relative z-10 mx-auto max-w-6xl px-4 py-20 md:px-6 md:py-28">
+          <p className="text-[10px] font-ui uppercase tracking-[0.35em] text-signal">
+            About
+          </p>
+          <h2 className="mt-2 max-w-xl font-display text-5xl text-paper md:text-7xl">
+            {ARTIST.legalName}
+          </h2>
+          <p className="mt-5 max-w-xl text-sm leading-relaxed text-paper/80 md:text-base">
+            {ARTIST.about}
+          </p>
+          <p className="mt-8 text-[10px] font-ui uppercase tracking-[0.28em] text-asphalt">
+            Football · Physiotherapy · Academics · Music
+          </p>
         </div>
       </section>
     </>

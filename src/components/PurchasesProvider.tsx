@@ -6,6 +6,7 @@ import {
   type ReactNode,
 } from "react";
 import { usePurchases } from "@/hooks/usePurchases";
+import { CartDrawer } from "@/components/CartDrawer";
 
 type PurchasesContextValue = ReturnType<typeof usePurchases>;
 
@@ -16,10 +17,11 @@ export function PurchasesProvider({ children }: { children: ReactNode }) {
   return (
     <PurchasesContext.Provider value={value}>
       {children}
+      <CartDrawer />
       {value.toast ? (
         <div
           role="status"
-          className="fixed bottom-5 left-1/2 z-[80] max-w-[90vw] -translate-x-1/2 border border-signal bg-ink px-4 py-3 text-center text-sm text-paper shadow-[0_0_0_1px_rgba(200,16,46,0.35)]"
+          className="toast-in fixed bottom-5 left-1/2 z-[80] max-w-[90vw] -translate-x-1/2 border border-signal bg-ink px-4 py-3 text-center text-sm text-paper shadow-[0_0_0_1px_rgba(200,16,46,0.35)]"
         >
           {value.toast}
         </div>
