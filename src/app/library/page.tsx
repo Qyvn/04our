@@ -1,106 +1,69 @@
 "use client";
 
 import Link from "next/link";
-import { TRACKS } from "@/lib/catalog";
-import { withBase } from "@/lib/paths";
+import { releaseById } from "@/data/songs";
+import { StreamingLinks } from "@/components/StreamingLinks";
 import { usePurchasesContext } from "@/components/PurchasesProvider";
+
+const when = (iso: string) =>
+  new Date(iso).toLocaleDateString("en-ZA", { timeZone: "Africa/Johannesburg" });
 
 export default function LibraryPage() {
   const { state, ready, clearAll } = usePurchasesContext();
-
-  const owned = state.tracks.map((ownedTrack) => {
-    const meta = TRACKS.find((t) => t.id === ownedTrack.trackId);
-    return { ownedTrack, meta };
-  });
+  const owned = state.tracks.map((o) => ({ o, meta: releaseById(o.trackId) }));
 
   return (
-    <main className="min-h-[70vh] border-b border-concrete bg-ink">
-      <div className="mx-auto max-w-6xl px-4 py-16 md:px-6 md:py-24">
-        <p className="text-[10px] font-ui uppercase tracking-[0.35em] text-signal">
-          Permanent access
-        </p>
-        <h1 className="mt-2 font-display text-4xl text-paper md:text-6xl">
-          My Crate
-        </h1>
-        <p className="mt-3 max-w-xl text-sm text-asphalt md:text-base">
-          Songs you bought stay here forever. Lost a file? Re-download free.
-          Duplicate buys are blocked on this account (demo: this browser).
-        </p>
+    <main className="band-ink page-min">
+      <div className="wrap">
+        <header className="section-head">
+          <p className="kicker">My Crate</p>
+          <h1 className="h-xl">Yours for good.</h1>
+          <p className="lede">
+            Releases you pick up stay here. Duplicate buys are blocked on this account (demo: this browser). Open any
+            release on your favourite platform from here.
+          </p>
+        </header>
 
         {!ready ? (
-          <p className="mt-10 text-asphalt">Loading crate…</p>
+          <p className="muted-note">Loading crate…</p>
         ) : owned.length === 0 ? (
-          <div className="mt-10 border border-dashed border-concrete p-8">
-            <p className="text-paper">Your crate is empty.</p>
-            <p className="mt-2 text-sm text-asphalt">
-              Buy a release on the shop, then come back to re-download anytime.
-            </p>
-            <Link
-              href="/#shop"
-              className="mt-6 inline-block bg-signal px-4 py-2 text-[10px] font-ui uppercase tracking-[0.2em] text-paper"
-            >
+          <div className="empty-crate">
+            <p>Your crate is empty.</p>
+            <p className="muted-note">Pick up a release in the shop, then come back anytime.</p>
+            <Link href="/#shop" className="btn btn-red btn-sm">
               Go to shop
             </Link>
           </div>
         ) : (
-          <ul className="mt-10 divide-y divide-concrete border-y border-concrete">
-            {owned.map(({ ownedTrack, meta }) => (
-              <li
-                key={ownedTrack.trackId}
-                className="flex flex-col gap-3 py-5 sm:flex-row sm:items-center sm:justify-between"
-              >
+          <ul className="shop-list">
+            {owned.map(({ o, meta }) => (
+              <li key={o.trackId} className="shop-row">
                 <div>
-                  <p className="font-display text-xl text-paper">
-                    {ownedTrack.title}
-                  </p>
-                  <p className="text-[10px] font-ui uppercase tracking-[0.18em] text-asphalt">
-                    Owned{" "}
-                    {new Date(ownedTrack.purchasedAt).toLocaleDateString(
-                      "en-ZA",
-                      { timeZone: "Africa/Johannesburg" },
-                    )}{" "}
-                    · Africa/Johannesburg
-                  </p>
+                  <p className="shop-title">{o.title}</p>
+                  <p className="shop-meta">Owned {when(o.purchasedAt)} · Africa/Johannesburg</p>
                 </div>
-                <a
-                  href={withBase(meta?.preview || "/audio/preview-tone.mp3")}
-                  download={`${ownedTrack.trackId}-04our.mp3`}
-                  className="inline-flex bg-signal px-4 py-2 text-[10px] font-ui uppercase tracking-[0.2em] text-paper"
-                >
-                  Re-download free
-                </a>
+                {meta ? <StreamingLinks release={meta} /> : null}
               </li>
             ))}
           </ul>
         )}
 
         {state.merch.length > 0 ? (
-          <div className="mt-12">
-            <h2 className="font-display text-2xl text-paper">Merch orders</h2>
-            <ul className="mt-4 space-y-2 text-sm text-asphalt">
+          <div className="crate-block">
+            <h2 className="h-lg">Merch orders</h2>
+            <ul className="crate-list">
               {state.merch.map((m) => (
                 <li key={`${m.merchId}-${m.purchasedAt}`}>
-                  {m.name} ·{" "}
-                  {new Date(m.purchasedAt).toLocaleDateString("en-ZA", {
-                    timeZone: "Africa/Johannesburg",
-                  })}
+                  {m.name} · {when(m.purchasedAt)}
                 </li>
               ))}
             </ul>
           </div>
         ) : null}
 
-        {state.support ? (
-          <p className="mt-10 text-sm text-signal">
-            Supporting as {state.support.name}
-          </p>
-        ) : null}
+        {state.support ? <p className="crate-support">Supporting as {state.support.name}</p> : null}
 
-        <button
-          type="button"
-          onClick={clearAll}
-          className="mt-12 border border-paper/20 px-3 py-2 text-[10px] font-ui uppercase tracking-[0.18em] text-asphalt hover:text-paper"
-        >
+        <button type="button" onClick={clearAll} className="btn btn-line btn-sm clear-btn">
           Clear demo library
         </button>
       </div>

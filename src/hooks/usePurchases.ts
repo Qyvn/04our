@@ -8,7 +8,8 @@ import {
   savePurchases,
   type PurchaseState,
 } from "@/lib/purchases";
-import type { MerchItem, SupportTier, Track } from "@/lib/catalog";
+import type { MerchItem, SupportTier } from "@/lib/catalog";
+import type { Release } from "@/data/songs";
 
 export function usePurchases() {
   const [state, setState] = useState<PurchaseState>(emptyPurchases);
@@ -33,7 +34,7 @@ export function usePurchases() {
   }, []);
 
   const buyTrack = useCallback(
-    (track: Track) => {
+    (track: Release) => {
       const current = loadPurchases();
       if (ownsTrack(current, track.id)) {
         setToast("Already in your crate — re-download free from My Library.");

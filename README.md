@@ -4,14 +4,16 @@ Artist site for **04OUR (Anele Ngubane)** — Direction A “Four of a Kind Stre
 
 ## What it includes
 
-1. Direct on-site music purchases (demo)
-2. Merchandise shelf
-3. Patreon-style support tiers
-4. **My Crate** — permanent access + free re-download; duplicate song buys blocked (`localStorage`)
-5. CD/cassette shelf → old-style radio → **30-second preview only**
-6. Socials: Instagram [`04ofakind`](https://www.instagram.com/04ofakind/), Facebook [`04ourr`](https://www.facebook.com/04ourr)
+1. **Listen** — a cassette-style deck: Apple Music 30-second `.m4a` previews, with the official YouTube video as a "Watch" link or as the player where Apple has no preview
+2. **Full discography** — every 04OUR release (EPs & albums, singles, features), searchable, from one data file: `src/data/songs.ts`
+3. **Videos** — official visuals / promos from 04OUR's channel, the "04our - Topic" channel and Tiny Films
+4. Direct on-site music purchases (demo, `localStorage`), merchandise shelf, patron support tiers, **My Crate**
+5. Socials: Instagram `04ofakind`, Facebook `04ourr`, YouTube `@04our66` and the "04our - Topic" channel
 
-No real payments. EPK email/phone are not shown.
+No real payments. Prices are placeholders. Every track, preview URL and video id in `songs.ts` was verified
+(iTunes Lookup API for artist 04our, Ditto smart-links, YouTube oEmbed). To add a song: add it to `RELEASES`.
+
+Design: bone / ink / signal-red (`#F2EFE8`, `#0B0B0C`, `#E4002B`); Anton, Space Grotesk and Space Mono.
 
 ## Local development
 
