@@ -33,6 +33,8 @@ export type Track = {
   /** Official YouTube Topic video for in-site listening */
   youtubeId?: string;
   soundcloudUrl?: string;
+  /** SoundCloud track id for the official embed player */
+  soundcloudId?: string;
 };
 
 export type MerchItem = {
@@ -133,6 +135,7 @@ export const TRACKS: Track[] = [
     dittoUrl: "https://ditto.fm/isinqumo-ep",
     youtubeId: "ob2yyls4MPQ",
     soundcloudUrl: "https://soundcloud.com/04our-music/my-father",
+    soundcloudId: "2393099739",
     tracklist: [
       "My Father (04:34)",
       "Indlalifa (03:34)",
@@ -158,6 +161,7 @@ export const TRACKS: Track[] = [
     dittoUrl: "https://ditto.fm/ukuhlwa-04our",
     youtubeId: "eJ_wMFV6KsM",
     soundcloudUrl: "https://soundcloud.com/04our-music/ukuhlwa",
+    soundcloudId: "2349374666",
     featuring: "Sbopho",
     tracklist: ["Ukuhlwa (02:25)"],
   },
@@ -171,7 +175,7 @@ export const TRACKS: Track[] = [
     cover: "/covers/kancane-kancane.jpg",
     preview: "/audio/preview-tone.mp3",
     description:
-      "Kancane Kancane — full official stream on-site via YouTube Topic.",
+      "Kancane Kancane — full official stream on-site via SoundCloud.",
     bpm: 94,
     musicalKey: "Em",
     tags: ["single", "kancane", "ditto", "2026"],
@@ -179,6 +183,7 @@ export const TRACKS: Track[] = [
     dittoUrl: "https://ditto.fm/kancane-kancane-04our",
     youtubeId: "YNxuqY1cMeI",
     soundcloudUrl: "https://soundcloud.com/04our-music/kancane-kancane",
+    soundcloudId: "2343532832",
     tracklist: ["Kancane Kancane (01:58)"],
   },
   {
@@ -212,6 +217,7 @@ export const TRACKS: Track[] = [
     licenses: licensesFor(29),
     youtubeId: "YD-DPeA9VF0",
     soundcloudUrl: "https://soundcloud.com/04our-music/sorry-personal-growth",
+    soundcloudId: "2329513895",
   },
   {
     id: "vimba",

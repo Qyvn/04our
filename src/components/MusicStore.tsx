@@ -13,7 +13,7 @@ import {
 } from "@/lib/catalog";
 import { withBase } from "@/lib/paths";
 import { usePurchasesContext } from "@/components/PurchasesProvider";
-import { YoutubePlayer } from "@/components/YoutubePlayer";
+import { SoundcloudEmbed } from "@/components/SoundcloudEmbed";
 
 type MusicStoreProps = {
   /** Compact home teaser vs full store page */
@@ -33,6 +33,7 @@ export function MusicStore({ variant = "full", limit }: MusicStoreProps) {
 
   const [query, setQuery] = useState("");
   const [playingId, setPlayingId] = useState<string | null>(null);
+  const [autoPlay, setAutoPlay] = useState(false);
   const [licenseTrack, setLicenseTrack] = useState<Track | null>(null);
 
   const catalog = useMemo(() => {
@@ -48,14 +49,20 @@ export function MusicStore({ variant = "full", limit }: MusicStoreProps) {
     return typeof limit === "number" ? filtered.slice(0, limit) : filtered;
   }, [query, limit]);
 
-  const activeVideoId = useMemo(() => {
-    if (!playingId) return null;
-    return TRACKS.find((track) => track.id === playingId)?.youtubeId ?? null;
-  }, [playingId]);
+  const activeTrack = useMemo(
+    () => TRACKS.find((track) => track.id === playingId) ?? null,
+    [playingId],
+  );
 
   const togglePreview = (track: Track) => {
-    if (!track.youtubeId) return;
-    setPlayingId((current) => (current === track.id ? null : track.id));
+    if (!track.soundcloudId) return;
+    if (playingId === track.id) {
+      setPlayingId(null);
+      setAutoPlay(false);
+      return;
+    }
+    setPlayingId(track.id);
+    setAutoPlay(true);
   };
 
   const openLicenses = (track: Track) => {
@@ -68,15 +75,6 @@ export function MusicStore({ variant = "full", limit }: MusicStoreProps) {
       id={variant === "teaser" ? "shop" : "store"}
       className="border-b border-concrete bg-[#0d0d0d]"
     >
-      <YoutubePlayer
-        videoId={activeVideoId}
-        playing={Boolean(activeVideoId)}
-        onPlayingChange={(isPlaying) => {
-          if (!isPlaying) setPlayingId(null);
-        }}
-        onTime={() => {}}
-        onEnded={() => setPlayingId(null)}
-      />
       <div className="mx-auto max-w-6xl px-4 py-16 md:px-6 md:py-24">
         <div className="mb-10 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl">
@@ -87,9 +85,9 @@ export function MusicStore({ variant = "full", limit }: MusicStoreProps) {
               {variant === "full" ? "Buy music" : "Music marketplace"}
             </h2>
             <p className="mt-3 text-sm text-asphalt md:text-base">
-              Play the real tracks on-site (official YouTube Topic), stream via
-              Ditto, or license MP3 / WAV / Exclusive into My Crate. Demo
-              payments only.
+              Play real tracks on-site via official SoundCloud, stream on Ditto,
+              or license MP3 / WAV / Exclusive into My Crate. Demo payments
+              only.
             </p>
           </div>
           {variant === "teaser" ? (
@@ -122,6 +120,31 @@ export function MusicStore({ variant = "full", limit }: MusicStoreProps) {
           </label>
         ) : null}
 
+        {activeTrack?.soundcloudId ? (
+          <div className="mb-8 border border-signal/40 bg-ink p-3">
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <p className="text-[10px] font-ui uppercase tracking-[0.22em] text-signal">
+                Now playing · {activeTrack.title}
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setPlayingId(null);
+                  setAutoPlay(false);
+                }}
+                className="text-[10px] font-ui uppercase tracking-[0.18em] text-asphalt hover:text-paper"
+              >
+                Close
+              </button>
+            </div>
+            <SoundcloudEmbed
+              trackId={activeTrack.soundcloudId}
+              title={activeTrack.title}
+              autoPlay={autoPlay}
+            />
+          </div>
+        ) : null}
+
         <div className="border-y border-concrete">
           <div className="hidden grid-cols-[auto_1fr_auto_auto] gap-4 border-b border-concrete px-2 py-3 text-[10px] font-ui uppercase tracking-[0.2em] text-asphalt md:grid">
             <span className="w-12">Play</span>
@@ -145,14 +168,14 @@ export function MusicStore({ variant = "full", limit }: MusicStoreProps) {
                   <button
                     type="button"
                     onClick={() => togglePreview(track)}
-                    disabled={!track.youtubeId}
+                    disabled={!track.soundcloudId}
                     className={`flex h-11 w-11 items-center justify-center border text-[10px] font-ui uppercase tracking-[0.14em] disabled:cursor-not-allowed disabled:opacity-30 ${
                       isPlaying
                         ? "border-signal bg-signal text-paper"
                         : "border-paper/30 text-paper hover:border-signal"
                     }`}
                     aria-label={
-                      isPlaying ? `Pause ${track.title}` : `Play ${track.title}`
+                      isPlaying ? `Stop ${track.title}` : `Play ${track.title}`
                     }
                   >
                     {isPlaying ? "II" : "▶"}

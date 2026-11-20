@@ -2,58 +2,34 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { formatDuration, SONGS, type Song } from "@/lib/songs";
 import { withBase } from "@/lib/paths";
-import { YoutubePlayer } from "@/components/YoutubePlayer";
+import { SoundcloudEmbed } from "@/components/SoundcloudEmbed";
 
 export function RadioCrate() {
-  const playable = useMemo(
-    () => SONGS.filter((song) => Boolean(song.youtubeId)),
-    [],
-  );
   const [loaded, setLoaded] = useState<Song | null>(null);
-  const [playing, setPlaying] = useState(false);
-  const [elapsed, setElapsed] = useState(0);
-  const [duration, setDuration] = useState(0);
+  const [autoPlay, setAutoPlay] = useState(false);
 
   const placeOnRadio = (song: Song) => {
-    setPlaying(false);
-    setElapsed(0);
-    setDuration(song.durationSec);
+    setAutoPlay(false);
     setLoaded(song);
   };
 
-  const togglePlay = () => {
-    if (!loaded?.youtubeId) return;
-    setPlaying((value) => !value);
+  const playLoaded = () => {
+    if (!loaded) return;
+    // Remount embed with auto_play=true so SoundCloud starts on user click
+    setAutoPlay(true);
+    setLoaded({ ...loaded });
   };
 
   const eject = () => {
     setLoaded(null);
-    setPlaying(false);
-    setElapsed(0);
-    setDuration(0);
+    setAutoPlay(false);
   };
-
-  const total = duration || loaded?.durationSec || 1;
 
   return (
     <section id="listen" className="border-b border-concrete bg-ink">
-      <YoutubePlayer
-        videoId={loaded?.youtubeId || null}
-        playing={playing}
-        onPlayingChange={setPlaying}
-        onTime={(current, totalSec) => {
-          setElapsed(current);
-          if (totalSec > 0) setDuration(totalSec);
-        }}
-        onEnded={() => {
-          setPlaying(false);
-          setElapsed(0);
-        }}
-      />
-
       <div className="mx-auto max-w-6xl px-4 py-16 md:px-6 md:py-24">
         <div className="mb-10 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
@@ -64,19 +40,19 @@ export function RadioCrate() {
               The Crate
             </h2>
             <p className="mt-3 max-w-lg text-sm text-asphalt md:text-base">
-              Tap a release onto the old radio and hear the real 04OUR track —
-              streamed from the official YouTube Topic upload.
+              Tap a release onto the deck, then hit play on the SoundCloud
+              player — real 04OUR audio, streamed officially.
             </p>
           </div>
           <p className="text-[10px] font-ui uppercase tracking-[0.25em] text-asphalt">
-            Full play · YouTube Topic
+            Full play · SoundCloud
           </p>
         </div>
 
         <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
           <div className="overflow-x-auto pb-2">
             <div className="flex min-w-max gap-5 border-b-4 border-concrete/60 pb-6 pt-2">
-              {playable.map((song) => {
+              {SONGS.map((song) => {
                 const active = loaded?.id === song.id;
                 return (
                   <button
@@ -106,7 +82,8 @@ export function RadioCrate() {
                       {song.title}
                     </p>
                     <p className="text-[10px] font-ui uppercase tracking-[0.18em] text-asphalt">
-                      {song.album ?? song.format} · {formatDuration(song.durationSec)}
+                      {song.album ?? song.format} ·{" "}
+                      {formatDuration(song.durationSec)}
                     </p>
                   </button>
                 );
@@ -129,15 +106,17 @@ export function RadioCrate() {
                   {loaded ? "TUNED · LIVE" : "EMPTY DECK"}
                 </div>
                 <div className="font-mono text-xs text-paper/70">
-                  {formatDuration(Math.min(total, Math.floor(elapsed)))} /{" "}
-                  {formatDuration(Math.floor(total))}
+                  {loaded
+                    ? formatDuration(loaded.durationSec)
+                    : "0:00 / —"}
                 </div>
               </div>
+
               <div className="mt-4 flex items-center gap-4">
                 <div
                   className={`relative h-20 w-20 shrink-0 overflow-hidden border border-paper/20 ${
                     loaded?.format === "cassette" ? "" : "rounded-full"
-                  } ${playing ? "animate-[spin_4s_linear_infinite]" : ""}`}
+                  }`}
                 >
                   {loaded ? (
                     <Image
@@ -164,24 +143,27 @@ export function RadioCrate() {
                         }`
                       : "Choose a disc or tape from the shelf."}
                   </p>
-                  <div className="mt-3 h-1.5 overflow-hidden bg-concrete">
-                    <div
-                      className="h-full bg-signal transition-[width] duration-200"
-                      style={{
-                        width: `${Math.min(100, (elapsed / total) * 100)}%`,
-                      }}
-                    />
-                  </div>
                 </div>
               </div>
+
+              {loaded ? (
+                <div className="mt-5 overflow-hidden border border-concrete">
+                  <SoundcloudEmbed
+                    trackId={loaded.soundcloudId}
+                    title={loaded.title}
+                    autoPlay={autoPlay}
+                  />
+                </div>
+              ) : null}
+
               <div className="mt-5 flex flex-wrap gap-2">
                 <button
                   type="button"
-                  disabled={!loaded?.youtubeId}
-                  onClick={togglePlay}
+                  disabled={!loaded}
+                  onClick={playLoaded}
                   className="bg-signal px-4 py-2 text-[10px] font-ui uppercase tracking-[0.2em] text-paper disabled:cursor-not-allowed disabled:opacity-40"
                 >
-                  {playing ? "Pause" : "Play track"}
+                  {autoPlay ? "Restart play" : "Play track"}
                 </button>
                 <button
                   type="button"
@@ -193,27 +175,16 @@ export function RadioCrate() {
                 </button>
                 {loaded ? (
                   <Link
-                    href={`/store`}
+                    href="/store"
                     className="border border-transparent px-4 py-2 text-[10px] font-ui uppercase tracking-[0.2em] text-asphalt hover:text-signal"
                   >
                     License / buy
                   </Link>
                 ) : null}
               </div>
-              {loaded?.soundcloudUrl ? (
-                <a
-                  href={loaded.soundcloudUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-4 inline-flex text-[10px] font-ui uppercase tracking-[0.2em] text-signal hover:underline"
-                >
-                  Also on SoundCloud →
-                </a>
-              ) : (
-                <p className="mt-4 text-[10px] uppercase tracking-[0.2em] text-asphalt">
-                  Official stream · Not a download
-                </p>
-              )}
+              <p className="mt-4 text-[10px] uppercase tracking-[0.2em] text-asphalt">
+                Official SoundCloud stream · Use the player controls above
+              </p>
             </div>
           </div>
         </div>
