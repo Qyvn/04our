@@ -29,8 +29,8 @@ export function Hero() {
           />
         </h1>
         <p className="hero-rise hero-rise-delay-2 mt-5 max-w-lg text-base text-paper/85 md:text-lg">
-          {ARTIST.tagline} Preview thirty seconds on the radio. Own the rest in
-          My Crate.
+          {ARTIST.tagline} Play the real tracks on the radio. License and keep
+          them in My Crate.
         </p>
         <div className="hero-rise hero-rise-delay-3 mt-8 flex flex-wrap gap-3">
           <Link

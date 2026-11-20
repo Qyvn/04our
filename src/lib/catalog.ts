@@ -30,6 +30,9 @@ export type Track = {
   dittoUrl?: string;
   tracklist?: string[];
   featuring?: string;
+  /** Official YouTube Topic video for in-site listening */
+  youtubeId?: string;
+  soundcloudUrl?: string;
 };
 
 export type MerchItem = {
@@ -128,6 +131,8 @@ export const TRACKS: Track[] = [
     tags: ["ep", "isinqumo", "ditto", "street"],
     licenses: licensesFor(89),
     dittoUrl: "https://ditto.fm/isinqumo-ep",
+    youtubeId: "ob2yyls4MPQ",
+    soundcloudUrl: "https://soundcloud.com/04our-music/my-father",
     tracklist: [
       "My Father (04:34)",
       "Indlalifa (03:34)",
@@ -145,12 +150,14 @@ export const TRACKS: Track[] = [
     cover: "/covers/ukuhlwa.jpg",
     preview: "/audio/preview-tone.mp3",
     description:
-      "Ukuhlwa with Sbopho — official Ditto smart link for Spotify, YouTube, Deezer, Tidal, and more.",
+      "Ukuhlwa with Sbopho — play the official upload on-site, or open Ditto / SoundCloud.",
     bpm: 98,
     musicalKey: "Gm",
     tags: ["single", "ukuhlwa", "ditto", "2026"],
     licenses: licensesFor(29),
     dittoUrl: "https://ditto.fm/ukuhlwa-04our",
+    youtubeId: "eJ_wMFV6KsM",
+    soundcloudUrl: "https://soundcloud.com/04our-music/ukuhlwa",
     featuring: "Sbopho",
     tracklist: ["Ukuhlwa (02:25)"],
   },
@@ -164,12 +171,14 @@ export const TRACKS: Track[] = [
     cover: "/covers/kancane-kancane.jpg",
     preview: "/audio/preview-tone.mp3",
     description:
-      "Kancane Kancane — listen / pre-save across DSPs through the official Ditto link.",
+      "Kancane Kancane — full official stream on-site via YouTube Topic.",
     bpm: 94,
     musicalKey: "Em",
     tags: ["single", "kancane", "ditto", "2026"],
     licenses: licensesFor(29),
     dittoUrl: "https://ditto.fm/kancane-kancane-04our",
+    youtubeId: "YNxuqY1cMeI",
+    soundcloudUrl: "https://soundcloud.com/04our-music/kancane-kancane",
     tracklist: ["Kancane Kancane (01:58)"],
   },
   {
@@ -196,11 +205,13 @@ export const TRACKS: Track[] = [
     format: "cassette",
     cover: "/covers/sorry.jpg",
     preview: "/audio/preview-tone.mp3",
-    description: "Chrome-type confession. Preview only — full track after purchase.",
+    description: "Chrome-type confession — official stream available on-site.",
     bpm: 88,
     musicalKey: "Dm",
     tags: ["single", "melodic"],
     licenses: licensesFor(29),
+    youtubeId: "YD-DPeA9VF0",
+    soundcloudUrl: "https://soundcloud.com/04our-music/sorry-personal-growth",
   },
   {
     id: "vimba",

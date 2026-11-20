@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ARTIST,
   TRACKS,
@@ -13,8 +13,7 @@ import {
 } from "@/lib/catalog";
 import { withBase } from "@/lib/paths";
 import { usePurchasesContext } from "@/components/PurchasesProvider";
-
-const PREVIEW_SECONDS = 30;
+import { YoutubePlayer } from "@/components/YoutubePlayer";
 
 type MusicStoreProps = {
   /** Compact home teaser vs full store page */
@@ -35,7 +34,6 @@ export function MusicStore({ variant = "full", limit }: MusicStoreProps) {
   const [query, setQuery] = useState("");
   const [playingId, setPlayingId] = useState<string | null>(null);
   const [licenseTrack, setLicenseTrack] = useState<Track | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const catalog = useMemo(() => {
     const filtered = TRACKS.filter((track) => {
@@ -50,42 +48,14 @@ export function MusicStore({ variant = "full", limit }: MusicStoreProps) {
     return typeof limit === "number" ? filtered.slice(0, limit) : filtered;
   }, [query, limit]);
 
-  useEffect(() => {
-    const audio = new Audio();
-    audioRef.current = audio;
-    const onTime = () => {
-      if (audio.currentTime >= PREVIEW_SECONDS) {
-        audio.pause();
-        audio.currentTime = 0;
-        setPlayingId(null);
-      }
-    };
-    const onEnded = () => setPlayingId(null);
-    audio.addEventListener("timeupdate", onTime);
-    audio.addEventListener("ended", onEnded);
-    return () => {
-      audio.pause();
-      audio.removeEventListener("timeupdate", onTime);
-      audio.removeEventListener("ended", onEnded);
-    };
-  }, []);
+  const activeVideoId = useMemo(() => {
+    if (!playingId) return null;
+    return TRACKS.find((track) => track.id === playingId)?.youtubeId ?? null;
+  }, [playingId]);
 
-  const togglePreview = async (track: Track) => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (playingId === track.id) {
-      audio.pause();
-      setPlayingId(null);
-      return;
-    }
-    audio.src = withBase(track.preview);
-    audio.currentTime = 0;
-    try {
-      await audio.play();
-      setPlayingId(track.id);
-    } catch {
-      setPlayingId(null);
-    }
+  const togglePreview = (track: Track) => {
+    if (!track.youtubeId) return;
+    setPlayingId((current) => (current === track.id ? null : track.id));
   };
 
   const openLicenses = (track: Track) => {
@@ -98,6 +68,15 @@ export function MusicStore({ variant = "full", limit }: MusicStoreProps) {
       id={variant === "teaser" ? "shop" : "store"}
       className="border-b border-concrete bg-[#0d0d0d]"
     >
+      <YoutubePlayer
+        videoId={activeVideoId}
+        playing={Boolean(activeVideoId)}
+        onPlayingChange={(isPlaying) => {
+          if (!isPlaying) setPlayingId(null);
+        }}
+        onTime={() => {}}
+        onEnded={() => setPlayingId(null)}
+      />
       <div className="mx-auto max-w-6xl px-4 py-16 md:px-6 md:py-24">
         <div className="mb-10 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl">
@@ -108,8 +87,9 @@ export function MusicStore({ variant = "full", limit }: MusicStoreProps) {
               {variant === "full" ? "Buy music" : "Music marketplace"}
             </h2>
             <p className="mt-3 text-sm text-asphalt md:text-base">
-              Preview on-site, stream via official Ditto links, or license MP3 /
-              WAV / Exclusive for download in My Crate. Demo payments only.
+              Play the real tracks on-site (official YouTube Topic), stream via
+              Ditto, or license MP3 / WAV / Exclusive into My Crate. Demo
+              payments only.
             </p>
           </div>
           {variant === "teaser" ? (
@@ -165,7 +145,8 @@ export function MusicStore({ variant = "full", limit }: MusicStoreProps) {
                   <button
                     type="button"
                     onClick={() => togglePreview(track)}
-                    className={`flex h-11 w-11 items-center justify-center border text-[10px] font-ui uppercase tracking-[0.14em] ${
+                    disabled={!track.youtubeId}
+                    className={`flex h-11 w-11 items-center justify-center border text-[10px] font-ui uppercase tracking-[0.14em] disabled:cursor-not-allowed disabled:opacity-30 ${
                       isPlaying
                         ? "border-signal bg-signal text-paper"
                         : "border-paper/30 text-paper hover:border-signal"
